@@ -45,7 +45,6 @@ __feature_init() {
 			# parse dependencies to init them first
 			local dep
 			local list_dep
-			local _origin=
 			local _force_origin=
 			local _prefer_origin=
 			local _dependencies=
@@ -67,6 +66,9 @@ __feature_init() {
 						_force_origin="SYSTEM"
 						continue
 					fi
+					if [ "$_force_origin" = "" ]; then
+						_force_origin="$(__feature_choose_force_origin $dep)"
+					fi
 
 					if [ "$dep" = "PREFER_ORIGIN_STELLA" ]; then
 						_prefer_origin="STELLA"
@@ -77,10 +79,7 @@ __feature_init() {
 						continue
 					fi
 
-					if [ "$_force_origin" = "" ]; then
-						_force_origin="$(__feature_choose_force_origin $dep)"
-					fi
-
+				
 
 
 					if [ "$_prefer_origin" = "SYSTEM" ]; then
@@ -718,6 +717,7 @@ __feature_install() {
 				__push_schema_context
 
 				for dep in $_dependencies; do
+					__log "INFO" "* Installing dependency $dep"
 
 					if [ "$dep" = "FORCE_ORIGIN_STELLA" ]; then
 						_force_origin="STELLA"
@@ -728,6 +728,12 @@ __feature_install() {
 						continue
 					fi
 
+					# TODO CONTINUE HERE
+					if [ "$_force_origin" = "" ]; then
+						_force_origin="$(__feature_choose_force_origin $dep)"
+					fi
+
+
 					if [ "$dep" = "PREFER_ORIGIN_STELLA" ]; then
 						_prefer_origin="STELLA"
 						continue
@@ -737,27 +743,68 @@ __feature_install() {
 						continue
 					fi
 
-
-
-
-					if [ "$_force_origin" = "" ]; then
-						_origin="$(__feature_choose_force_origin $dep)"
-					else
-						_origin="$_force_origin"
+					if [ "$_prefer_origin" = "SYSTEM" ]; then
+						# look up dep in system
+						__feature_catalog_info "${dep}"
+						_test="$(which $FEAT_TEST 2>/dev/null)"
+						if [ "$_test" = "" ]; then
+							__log "WARN" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with preference from SYSTEM and listed in $_dependencies NOT found ===> Try to fallback on a STELLA recipe"
+							# a dependency is not added to current app properties
+							__feature_install "$dep" "$_OPT NON_DECLARED"
+							if [ "$TEST_FEATURE" = "0" ]; then
+								__log "ERROR" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with preference from STELLA and listed in $_dependencies can not be initialized or is not installed."
+								exit 1
+							else
+								__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with preference from STELLA and listed in $_dependencies is installed and initialized."
+							fi
+						else
+							__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with preference from SYSTEM and listed in $_dependencies is used. Found in $_test."
+						fi
 					fi
 
-					if [ "$_origin" = "STELLA" ]; then
-						__log "INFO" "Installing dependency $dep"
+					if [ "$_prefer_origin" = "STELLA" ]; then
+						# a dependency is not added to current app properties
+						__feature_install "$dep" "$_OPT NON_DECLARED"
+						if [ "$TEST_FEATURE" = "0" ]; then
+							__log "WARN" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with preference from STELLA and listed in $_dependencies can not be initialized or is not installed. ===> Try to fallback on SYSTEM."
+							# look up dep in system
+							_test="$(which $FEAT_TEST 2>/dev/null)"
+							if [ "$_test" = "" ]; then
+								__log "ERROR" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with preference from SYSTEM and listed in $_dependencies NOT found."
+								exit 1
+							else
+								__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with preference from SYSTEM and listed in $_dependencies is used. Found in $_test."
+							fi
+						else
+							__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with preference from STELLA and listed in $_dependencies is installed and initialized."
+						fi
+					fi
 
+
+
+				
+					if [ "$_force_origin" = "STELLA" ]; then
 						# a dependency is not added to current app properties
 						__feature_install $dep "$_OPT NON_DECLARED"
 						if [ "$TEST_FEATURE" = "0" ]; then
-							__log "INFO" "** Error while installing dependency feature $FEAT_SCHEMA_SELECTED"
+							__log "ERROR" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with force origin from STELLA and listed in $_dependencies can not be initialized or is not installed."
+							exit 1
+						else
+							__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency with force origin from STELLA and listed in $_dependencies is installed and initialized."
 						fi
-
 					fi
-					[ "$_origin" = "SYSTEM" ] && __log "INFO" "Using dependency $dep from SYSTEM."
 
+					if [ "$_force_origin" = "SYSTEM" ]; then
+						# look up dep in system
+						__feature_catalog_info "${dep}"
+						_test="$(which $FEAT_TEST 2>/dev/null)"
+						if [ "$_test" = "" ]; then
+							__log "INFO" "** ${_current_feat} : $dep dependency with force origin from SYSTEM and listed in $_dependencies NOT found. Which may be a problem or not."
+						else
+							__log "INFO" "** ${_current_feat} : $dep dependency with force origin from SYSTEM and listed in $_dependencies is used. Found in $_test."
+						fi
+					fi
+					
 				done
 
 				__pop_schema_context
