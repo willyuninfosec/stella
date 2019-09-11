@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 if [ ! "$_AUTOTOOLS_INCLUDED_" = "1" ]; then
 _AUTOTOOLS_INCLUDED_=1
 

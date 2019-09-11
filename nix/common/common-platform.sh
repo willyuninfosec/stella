@@ -1,4 +1,4 @@
-#!sh
+# shellcheck shell=bash
 if [ ! "$_STELLA_PLATFORM_INCLUDED_" = "1" ]; then
 _STELLA_PLATFORM_INCLUDED_=1
 

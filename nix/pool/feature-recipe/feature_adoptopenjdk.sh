@@ -1,16 +1,12 @@
+# shellcheck shell=bash
+# shellcheck disable=2034
 if [ ! "$_adoptopenjdk_INCLUDED_" = "1" ]; then
 _adoptopenjdk_INCLUDED_=1
 
 
 # Recipe for Open Java Development Kit (=JDK)
 
-# CHANGE in Java/Oracle Licence model:
-#		* It is impossible to automate oraclejdk download now
-#		* Now there is OpenJDK and OracleJDK
-#		* There is a lot of OpenJDK distributor including Oracle (so OpenJDK crom Oracle is not the same than OracleJDK)
-
-# List of OpenJDK distributor : https://dzone.com/articles/java-and-the-jdks-which-one-to-use
-
+# see openjdk feature
 
 # NOTE : AdoptOpenJDK provide an Hotspot JVM, but can provide OepnJ9 JVM instead (not included in this recipe)
 
@@ -49,8 +45,15 @@ feature_adoptopenjdk_12_0_2_10_2() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
-	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
+	if [ "$STELLA_CURRENT_PLATFORM" = "linux" ]; then
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
+	fi
+
+	if [ "$STELLA_CURRENT_PLATFORM" = "darwin" ]; then
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/java"
+		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/Contents/Home/"
+	fi
 }
 
 
@@ -74,8 +77,15 @@ feature_adoptopenjdk_11_0_4_11() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
-	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
+	if [ "$STELLA_CURRENT_PLATFORM" = "linux" ]; then
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
+	fi
+
+	if [ "$STELLA_CURRENT_PLATFORM" = "darwin" ]; then
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/java"
+		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/Contents/Home/"
+	fi
 }
 
 
@@ -116,8 +126,15 @@ feature_adoptopenjdk_8_u222_b10() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
-	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
+	if [ "$STELLA_CURRENT_PLATFORM" = "linux" ]; then
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
+	fi
+
+	if [ "$STELLA_CURRENT_PLATFORM" = "darwin" ]; then
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/java"
+		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/Contents/Home/"
+	fi
 }
 
 
@@ -156,8 +173,15 @@ feature_adoptopenjdk_8_u172_b11() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
-	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
+	if [ "$STELLA_CURRENT_PLATFORM" = "linux" ]; then
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
+	fi
+
+	if [ "$STELLA_CURRENT_PLATFORM" = "darwin" ]; then
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/java"
+		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/Contents/Home/"
+	fi
 }
 
 
@@ -165,18 +189,18 @@ feature_adoptopenjdk_8_u172_b11() {
 # http://stackoverflow.com/a/24996278
 feature_adoptopenjdk_fix_jni_header() {
 	if [ "$STELLA_CURRENT_PLATFORM" = "darwin" ]; then
-		ln -s $FEAT_INSTALL_ROOT/include/darwin/jni_md.h $FEAT_INSTALL_ROOT/include/jni_md.h
-		ln -s $FEAT_INSTALL_ROOT/include/darwin/jawt_md.h $FEAT_INSTALL_ROOT/include/jawt_md.h
+		ln -s "${FEAT_INSTALL_ROOT}/Contents/Home/include/darwin/jni_md.h" "${FEAT_INSTALL_ROOT}/Contents/Home/include/jni_md.h"
+		ln -s "${FEAT_INSTALL_ROOT}/Contents/Home/include/darwin/jawt_md.h" "${FEAT_INSTALL_ROOT}/Contents/Home/include/jawt_md.h"
 	fi
 	if [ "$STELLA_CURRENT_PLATFORM" = "linux" ]; then
-		ln -s $FEAT_INSTALL_ROOT/include/linux/jni_md.h $FEAT_INSTALL_ROOT/include/jni_md.h
-		ln -s $FEAT_INSTALL_ROOT/include/linux/jawt_md.h $FEAT_INSTALL_ROOT/include/jawt_md.h
+		ln -s "${FEAT_INSTALL_ROOT}/Contents/Home/include/linux/jni_md.h" "${FEAT_INSTALL_ROOT}/Contents/Home/include/jni_md.h"
+		ln -s "${FEAT_INSTALL_ROOT}/Contents/Home/include/linux/jawt_md.h" "${FEAT_INSTALL_ROOT}/Contents/Home/include/jawt_md.h"
 	fi
 }
 
 
 feature_adoptopenjdk_install_binary() {
-	INSTALL_DIR="$FEAT_INSTALL_ROOT"
+	INSTALL_DIR="${FEAT_INSTALL_ROOT}"
 
 
 	__get_resource "$FEAT_NAME" "$FEAT_BINARY_URL" "$FEAT_BINARY_URL_PROTOCOL" "$INSTALL_DIR" "DEST_ERASE STRIP"

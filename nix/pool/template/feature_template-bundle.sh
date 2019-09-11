@@ -1,5 +1,6 @@
-if [ ! "$_TEMPLATE-BUNDLE_INCLUDED_" = "1" ]; then
-_TEMPLATE-BUNDLE_INCLUDED_=1
+# shellcheck shell=bash
+if [ ! "$_TEMPLATEBUNDLE_INCLUDED_" = "1" ]; then
+_TEMPLATEBUNDLE_INCLUDED_=1
 
 
 feature_template-bundle() {
@@ -10,11 +11,13 @@ feature_template-bundle() {
 	FEAT_DESC="template is foo"
 	FEAT_LINK="https://github.com/bar/template"
 
-	# should be MERGE or NESTED or LIST
-	# NESTED : each item will be installed inside the bundle path in a separate directory (with each feature name but without version)
-	# MERGE : each item will be installed in the bundle path (without each feature name/version)
+	# should be MERGE or NESTED or LIST or MERGE_LIST or PROXY
+	# NESTED : [feat_bundle_name/feat_bundle_version/feat_bundle_item_name/feat files] each item will be installed inside the bundle path (bundle_name/bundle_version) in a separate directory without feat version
+	# MERGE : [feat_bundle_name/feat_bundle_version/feat files] each item will be installed in the bundle path (bundle_name/bundle_version) but without each feature name/version
+	# PROXY :[feat_bundle_name/feat_bundle_item_version/feat files]  only one item will be installed in the bundle path but with feat version (bundle_name/feat_version) and without any other feature subfolder
 	# LIST : this bundle is just a list of item that will be installed normally
-	# MERGE_LIST : this bundle is a list of items that will be installed in a MERGED way (without bundle name nor version AND without each feature name/version)
+	# MERGE_LIST : [feat_bundle_name/feat files] this bundle is a list of items that will be installed in a MERGED way (without bundle name nor version AND without each feature name/version)
+
 	FEAT_BUNDLE=NESTED
 }
 

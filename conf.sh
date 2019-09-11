@@ -1,4 +1,4 @@
-#!sh
+# shellcheck shell=bash
 if [ ! "$_STELLA_CONF_INCLUDED_" = "1" ]; then
 _STELLA_CONF_INCLUDED_=1
 
@@ -14,7 +14,7 @@ if [ "$STELLA_CURRENT_RUNNING_DIR" = "" ]; then
 	#STELLA_CURRENT_RUNNING_DIR="$( cd "$( dirname "${BASH_SOURCE[1]}" )" && pwd )"
 	STELLA_CURRENT_RUNNING_DIR="$( cd "$( dirname "." )" && pwd )"
 fi
-_STELLA_CONF_CURRENT_FILE="$_STELLA_CONF_CURRENT_FILE_DIR/$(basename ${BASH_SOURCE[0]})"
+_STELLA_CONF_CURRENT_FILE="$_STELLA_CONF_CURRENT_FILE_DIR/$(basename "${BASH_SOURCE[0]}")"
 
 
 # STELLA PATHS ---------------------------------------------
@@ -46,41 +46,41 @@ STELLA_DIST_URL="$STELLA_URL/dist"
 # STELLA INCLUDE ---------------------------------------------
 
 #shellcheck source=nix/common/stack.sh
-. $STELLA_COMMON/stack.sh
+. "${STELLA_COMMON}/stack.sh"
 #shellcheck source=nix/common/common-log.sh
-. $STELLA_COMMON/common-log.sh
+. "${STELLA_COMMON}/common-log.sh"
 #shellcheck source=nix/common/common-platform.sh
-. $STELLA_COMMON/common-platform.sh
+. "$STELLA_COMMON/common-platform.sh"
 #shellcheck source=nix/common/common.sh
-. $STELLA_COMMON/common.sh
+. "$STELLA_COMMON/common.sh"
 #shellcheck source=nix/common/common-feature.sh
-. $STELLA_COMMON/common-feature.sh
+. "$STELLA_COMMON/common-feature.sh"
 #shellcheck source=nix/common/common-app.sh
-. $STELLA_COMMON/common-app.sh
-#shellcheck source=nix/common/common-lib-parse-bin.sh
-. $STELLA_COMMON/lib-parse-bin.sh
+. "$STELLA_COMMON/common-app.sh"
+#shellcheck source=nix/common/lib-parse-bin.sh
+. "${STELLA_COMMON}/lib-parse-bin.sh"
 #shellcheck source=nix/common/common-binary.sh
-. $STELLA_COMMON/common-binary.sh
+. "${STELLA_COMMON}/common-binary.sh"
 #shellcheck source=nix/common/common-build.sh
-. $STELLA_COMMON/common-build.sh
+. "${STELLA_COMMON}/common-build.sh"
 #shellcheck source=nix/common/common-build-toolset.sh
-. $STELLA_COMMON/common-build-toolset.sh
+. "${STELLA_COMMON}/common-build-toolset.sh"
 #shellcheck source=nix/common/common-build-env.sh
-. $STELLA_COMMON/common-build-env.sh
+. "${STELLA_COMMON}/common-build-env.sh"
 #shellcheck source=nix/common/common-build-link.sh
-. $STELLA_COMMON/common-build-link.sh
+. "${STELLA_COMMON}/common-build-link.sh"
 #shellcheck source=nix/common/common-api.sh
-. $STELLA_COMMON/common-api.sh
+. "${STELLA_COMMON}/common-api.sh"
 #shellcheck source=nix/common/lib-sfx.sh
-. $STELLA_COMMON/lib-sfx.sh
+. "${STELLA_COMMON}/lib-sfx.sh"
 #shellcheck source=nix/common/common-network.sh
-. $STELLA_COMMON/common-network.sh
+. "${STELLA_COMMON}/common-network.sh"
 #shellcheck source=nix/common/common-boot.sh
-. $STELLA_COMMON/common-boot.sh
+. "${STELLA_COMMON}/common-boot.sh"
 
 # STELLA ARTEFACT INCLUDE ---------------------------------------------
-
-. $STELLA_ARTEFACT/bash_ini_parser/read_ini.sh
+#shellcheck disable=1091
+. "${STELLA_ARTEFACT}/bash_ini_parser/read_ini.sh"
 
 # LOG ---------------------------
 # Before include stella-link.sh, you can override log state
@@ -111,7 +111,7 @@ if [ "$STELLA_APP_ROOT" = "" ]; then
 	STELLA_APP_NAME=stella
 else
 	STELLA_APP_NAME=
-	_STELLA_APP_PROPERTIES_FILE="$(__select_app $STELLA_APP_ROOT)"
+	_STELLA_APP_PROPERTIES_FILE="$(__select_app "${STELLA_APP_ROOT}")"
 	__get_all_properties $_STELLA_APP_PROPERTIES_FILE
 
 	[ "$STELLA_APP_NAME" = "" ] && STELLA_APP_NAME=default-app

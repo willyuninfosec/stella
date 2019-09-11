@@ -1,4 +1,4 @@
-#!sh
+# shellcheck shell=bash
 if [ ! "$_STELLA_COMMON_BUILD_TOOLSET_INCLUDED_" = "1" ]; then
 _STELLA_COMMON_BUILD_TOOLSET_INCLUDED_=1
 

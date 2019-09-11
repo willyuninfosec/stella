@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 if [ ! "$_PACKER_INCLUDED_" = "1" ]; then
 _PACKER_INCLUDED_=1
 
@@ -5,7 +6,6 @@ _PACKER_INCLUDED_=1
 
 
 feature_packer() {
-
 	FEAT_NAME=packer
 	FEAT_LIST_SCHEMA="0_6_0@x64:binary 0_6_0@x86:binary 0_7_5@x64:binary 0_7_5@x86:binary"
 	FEAT_DEFAULT_ARCH=x64
@@ -91,8 +91,8 @@ feature_packer_install_binary() {
 
 	__get_resource "$FEAT_NAME" "$FEAT_BINARY_URL" "$FEAT_BINARY_URL_PROTOCOL" "$FEAT_INSTALL_ROOT" "STRIP FORCE_NAME $FEAT_BINARY_URL_FILENAME"
 
-	if [ -d "$FEAT_INSTALL_ROOT" ]; then
-		chmod +x $FEAT_INSTALL_ROOT/*
+	if [ -d "${FEAT_INSTALL_ROOT}" ]; then
+		chmod +x "${FEAT_INSTALL_ROOT}"/*
 	fi
 
 }

@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 if [ ! "$_EXPORTMODE_INCLUDED_" = "1" ]; then
 _EXPORTMODE_INCLUDED_=1
 

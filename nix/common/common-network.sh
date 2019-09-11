@@ -1,4 +1,4 @@
-#!sh
+# shellcheck shell=bash
 if [ ! "$_STELLA_COMMON_NET_INCLUDED_" = "1" ]; then
 _STELLA_COMMON_NET_INCLUDED_=1
 
@@ -529,9 +529,10 @@ __get_ip_from_interface() {
 __get_ip_from_hostname() {
 	type getent &>/dev/null
 	if [ $? = 0 ]; then
-		echo "$(getent ahostsv4 $1 | grep STREAM | head -n 1 | cut -d ' ' -f 1)"
+		getent ahostsv4 $1 | grep STREAM | head -n 1 | cut -d ' ' -f 1
 	else
-		echo "$(ping -q -c 1 -t 1 $1 2>/dev/null | grep -m 1 PING | cut -d "(" -f2 | cut -d ")" -f1)"
+		#echo "$(ping -q -c 1 -t 1 $1 2>/dev/null | grep -m 1 PING | cut -d "(" -f2 | cut -d ")" -f1)"
+		ping -c 1 $1 | awk -F '[()]' '/PING/{print $2}'
 	fi
 }
 

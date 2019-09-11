@@ -1,4 +1,4 @@
-#!sh
+# shellcheck shell=bash
 if [ ! "$_STELLA_BOOT_INCLUDED_" = "1" ]; then
 _STELLA_BOOT_INCLUDED_=1
 
