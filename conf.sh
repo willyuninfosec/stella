@@ -194,8 +194,8 @@ fi
 
 # these features will be picked from the system
 # have an effect only for feature declared in FEAT_SOURCE_DEPENDENCIES, FEAT_BINARY_DEPENDENCIES or passed to __link_feature_libray
-[ "$STELLA_CURRENT_PLATFORM" = "darwin" ] && STELLA_FEATURE_FROM_SYSTEM="python krb5"
-[ "$STELLA_CURRENT_PLATFORM" = "linux" ] && STELLA_FEATURE_FROM_SYSTEM="openssl python krb5"
+[ "$STELLA_CURRENT_PLATFORM" = "darwin" ] && STELLA_FEATURE_FORCE_ORIGIN_FROM_SYSTEM="python krb5"
+[ "$STELLA_CURRENT_PLATFORM" = "linux" ] && STELLA_FEATURE_FORCE_ORIGIN_FROM_SYSTEM="openssl python krb5"
 
 # SYS PACKAGE --------------------------------------------
 # list of available installable system package

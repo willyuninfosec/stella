@@ -43,10 +43,12 @@ feature_template-bundle_1_0_0() {
 	# automatic callback after all items in bundle list are installed
 	FEAT_BUNDLE_CALLBACK=
 
-	# List of files to test if feature is installed
-	FEAT_INSTALL_TEST=$FEAT_INSTALL_ROOT/bin/template-bundle
+	# List of files to test if feature is installed (prefer binary files, because they are often in PATH if we need to use SYSTEM version)
+	FEAT_FILE_TEST="template-bundle"
+	# List of path to files to test if feature is installed
+	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_FILE_TEST"
 	# PATH to add to system PATH
-	FEAT_SEARCH_PATH=$FEAT_INSTALL_ROOT/bin
+	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 
 }
 

@@ -22,6 +22,8 @@ __list_feature_version() {
 }
 
 
+# FORCE_ORIGIN_STELLA : force to use a stella feature for dependencies (it is the default)
+# FORCE_ORIGIN_SYSTEM : force to use a dependencies already installed on system. Will use FEAT_TEST to try to guess if it is installed
 __feature_init() {
 	local _SCHEMA=$1
 	local _OPT="$2"
@@ -42,38 +44,102 @@ __feature_init() {
 
 			# parse dependencies to init them first
 			local dep
+			local list_dep
 			local _origin=
 			local _force_origin=
+			local _prefer_origin=
 			local _dependencies=
-			# TODO : we init all dependencies (not relying on feature flavour)
-			#	but it should be better to have FEAT_RUNTIME_DEPENDENCIES different from DEPENDENCIES while BUILDING (FEAT_SOURCE_DEPENDENCIES)
-			_dependencies="${FEAT_BINARY_DEPENDENCIES} ${FEAT_SOURCE_DEPENDENCIES}"
+			local _test
+			
 			local _current_feat=${FEAT_SCHEMA_SELECTED}
 			__push_schema_context
 
-			for dep in $_dependencies; do
-				if [ "$dep" = "FORCE_ORIGIN_STELLA" ]; then
-					_force_origin="STELLA"
-					continue
-				fi
-				if [ "$dep" = "FORCE_ORIGIN_SYSTEM" ]; then
-					_force_origin="SYSTEM"
-					continue
-				fi
+			# NOTE : we init all dependencies (not relying on feature flavour)
+			# 		if some deps are missing, this might not be an error, because we try to init FEAT_SOURCE_DEPENDENCIES and FEAT_BINARY_DEPENDENCIES altogether
+			#		 mainly because we do not know if a feature have been installed from SOURCE or BINARY flavour
+			for _dependencies in FEAT_BINARY_DEPENDENCIES FEAT_SOURCE_DEPENDENCIES;
+				for dep in ${!_dependencies}; do
+					if [ "$dep" = "FORCE_ORIGIN_STELLA" ]; then
+						_force_origin="STELLA"
+						continue
+					fi
+					if [ "$dep" = "FORCE_ORIGIN_SYSTEM" ]; then
+						_force_origin="SYSTEM"
+						continue
+					fi
 
-				if [ "$_force_origin" = "" ]; then
-					_origin="$(__feature_choose_origin $dep)"
-				else
-					_origin="$_force_origin"
-				fi
+					if [ "$dep" = "PREFER_ORIGIN_STELLA" ]; then
+						_prefer_origin="STELLA"
+						continue
+					fi
+					if [ "$dep" = "PREFER_ORIGIN_SYSTEM" ]; then
+						_prefer_origin="SYSTEM"
+						continue
+					fi
 
-				if [ "$_origin" = "STELLA" ]; then
-					__feature_init ${dep}
-					# if some deps are missing, this might not be an error, because we have merged FEAT_SOURCE_DEPENDENCIES and FEAT_BINARY_DEPENDENCIES
-					#if [ "$TEST_FEATURE" = "0" ]; then
-					#	__log "DEBUG" "** ${_current_feat} dependency $dep seems can not be initialized or is not installed."
-					#fi
-				fi
+					if [ "$_force_origin" = "" ]; then
+						_force_origin="$(__feature_choose_force_origin $dep)"
+					fi
+
+
+
+					if [ "$_prefer_origin" = "SYSTEM" ]; then
+						# look up dep in system
+						__feature_catalog_info "${dep}"
+						_test="$(which $FEAT_TEST 2>/dev/null)"
+						if [ "$_test" = "" ]; then
+							__log "DEBUG" "** ${_current_feat} : $dep dependency with preference from SYSTEM and listed in $_dependencies NOT found ===> Try to fallback on a STELLA recipe"
+							# look up dep as stella feature and init it
+							__feature_init ${dep}
+							if [ "$TEST_FEATURE" = "0" ]; then
+								__log "DEBUG" "** ${_current_feat} : $dep dependency with preference from STELLA and listed in $_dependencies can not be initialized or is not installed. Which may be a problem or not."
+							else
+								__log "DEBUG" "** ${_current_feat} : $dep dependency with preference from STELLA and listed in $_dependencies is used and initialized."
+							fi
+						else
+							__log "DEBUG" "** ${_current_feat} : $dep dependency with preference from SYSTEM and listed in $_dependencies is used. Found in $_test."
+						fi
+					fi
+
+					if [ "$_prefer_origin" = "STELLA" ]; then
+						# look up dep as stella feature and init it
+						__feature_init "${dep}"
+						if [ "$TEST_FEATURE" = "0" ]; then
+							__log "DEBUG" "** ${_current_feat} : $dep dependency with preference from STELLA and listed in $_dependencies can not be initialized or is not installed. ===> Try to fallback on SYSTEM."
+							# look up dep in system
+							_test="$(which $FEAT_TEST 2>/dev/null)"
+							if [ "$_test" = "" ]; then
+								__log "DEBUG" "** ${_current_feat} : $dep dependency with preference from SYSTEM and listed in $_dependencies NOT found. Which may be a problem or not."
+							else
+								__log "DEBUG" "** ${_current_feat} : $dep dependency with preference from SYSTEM and listed in $_dependencies is used. Found in $_test."
+							fi
+						else
+							__log "DEBUG" "** ${_current_feat} : $dep dependency with preference from STELLA and listed in $_dependencies is used and initialized."
+						fi
+					fi
+
+
+					if [ "$_force_origin" = "STELLA" ]; then
+						# look up dep as stella feature and init it
+						__feature_init "${dep}"
+						if [ "$TEST_FEATURE" = "0" ]; then
+							__log "DEBUG" "** ${_current_feat} : $dep dependency with force origin from STELLA and listed in $_dependencies can not be initialized or is not installed. Which may be a problem or not."
+						else
+							__log "DEBUG" "** ${_current_feat} : $dep dependency with force origin from STELLA and listed in $_dependencies is used and initialized."
+						fi
+					fi
+
+					if [ "$_force_origin" = "SYSTEM" ]; then
+						# look up dep in system
+						__feature_catalog_info "${dep}"
+						_test="$(which $FEAT_TEST 2>/dev/null)"
+						if [ "$_test" = "" ]; then
+							__log "DEBUG" "** ${_current_feat} : $dep dependency with force origin from SYSTEM and listed in $_dependencies NOT found. Which may be a problem or not."
+						else
+							__log "DEBUG" "** ${_current_feat} : $dep dependency with force origin from SYSTEM and listed in $_dependencies is used. Found in $_test."
+						fi
+					fi
+				done
 			done
 			__pop_schema_context
 
@@ -494,12 +560,12 @@ __feature_install_list() {
 }
 
 
-__feature_choose_origin() {
+__feature_choose_force_origin() {
 	local _SCHEMA="$1"
 	__translate_schema "$_SCHEMA" "_CHOOSE_ORIGIN_FEATURE_NAME"
 
 	local _origin="STELLA"
-	for u in $STELLA_FEATURE_FROM_SYSTEM; do
+	for u in $STELLA_FEATURE_FORCE_ORIGIN_FROM_SYSTEM; do
 		[ "$u" = "$_CHOOSE_ORIGIN_FEATURE_NAME" ] && _origin="SYSTEM"
 	done
 
@@ -641,6 +707,7 @@ __feature_install() {
 
 				local _origin=
 				local _force_origin=
+				local _prefer_origin=
 				local _dependencies=
 				[ "$FEAT_SCHEMA_FLAVOUR" = "source" ] && _dependencies="$FEAT_SOURCE_DEPENDENCIES"
 				[ "$FEAT_SCHEMA_FLAVOUR" = "binary" ] && _dependencies="$FEAT_BINARY_DEPENDENCIES"
@@ -661,8 +728,20 @@ __feature_install() {
 						continue
 					fi
 
+					if [ "$dep" = "PREFER_ORIGIN_STELLA" ]; then
+						_prefer_origin="STELLA"
+						continue
+					fi
+					if [ "$dep" = "PREFER_ORIGIN_SYSTEM" ]; then
+						_prefer_origin="SYSTEM"
+						continue
+					fi
+
+
+
+
 					if [ "$_force_origin" = "" ]; then
-						_origin="$(__feature_choose_origin $dep)"
+						_origin="$(__feature_choose_force_origin $dep)"
 					else
 						_origin="$_force_origin"
 					fi
