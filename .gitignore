@@ -6,3 +6,4 @@ cache/
 .stella-ftp-credentials
 .bash_history
 .vagrant/
+.vscode/

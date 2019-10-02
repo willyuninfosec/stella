@@ -1,8 +1,33 @@
-#!sh
+#!/bin/bash
 if [ ! "$_STELLA_COMMON_BUILD_LINK_INCLUDED_" = "1" ]; then
 _STELLA_COMMON_BUILD_LINK_INCLUDED_=1
 
 
+__link_system_library() {
+	local SCHEMA="$1"
+	local _link_OPT="$2"
+	# USE_PKG_CONFIG -- use of pkg-config
+
+	local _opt_use_pkg_config=OFF
+	for o in $_link_OPT; do
+		[ "$o" = "USE_PKG_CONFIG" ] && _opt_use_pkg_config=ON
+	done
+
+	STELLA_LINKED_LIBS_SYSTEM_LIST="$STELLA_LINKED_LIBS_SYSTEM_LIST [ ${SCHEMA} options: ${_link_OPT} ]"
+	echo "We do not link against STELLA version of $SCHEMA, but from lib already existing on SYSTEM."
+	if [ "$_opt_use_pkg_config" = "ON" ]; then
+		__add_toolset "pkgconfig"
+		# we need to add some defaut search into path, because pkgconfig have default values from its install path
+		# pkgconfig is installed inside stella and do not have correct default values when we want to link against SYSTEM libraries
+		echo "** WARN : adding some system lib search path for pkg-config, because we use pkg-config for a SYSTEM lib"
+		# TODO __default_linker_search_path should receive arch, because linker search path depend on arch
+		__def_path=$(__default_linker_search_path)
+		__def_path="${__def_path//:/ }"
+		for _p in $__def_path; do
+			STELLA_BUILD_PKG_CONFIG_PATH="${STELLA_BUILD_PKG_CONFIG_PATH}:${_p}/pkgconfig"
+		done
+	fi
+}
 
 __link_feature_library() {
 	local SCHEMA="$1"
@@ -17,7 +42,7 @@ __link_feature_library() {
 	# GET_FOLDER <prefix> -- get prefix_ROOT, prefix_LIB, prefix_BIN, prefix_INCLUDE with correct path
 	# NO_SET_FLAGS -- do not set stella build system flags (by default, flags will be generated) AND do not add RPATH values
 	# LIBS_NAME -- libraries name to use with -l arg -- you can specify several libraries. If you do not use LIBS_NAME -l flag will not be setted, only -L will be setted. If you use LIBS_NAME both -l and -L flags will be setted
-  # USE_PKG_CONFIG -- use of pkg-config
+  	# USE_PKG_CONFIG -- use of pkg-config
 
 	local _ROOT=
 	local _BIN=
@@ -78,54 +103,113 @@ __link_feature_library() {
 	done
 
 	# check origin for this schema
+	# NOTE : we cannot implement PREFER_ORIGIN_SYSTEM whith fallback mechanism on the other, because we cannot check if a lib exists on system or not
+	#		to be capable of fallback on a stella installed lib
 	local _origin
 	case "$SCHEMA" in
 		FORCE_ORIGIN_STELLA*)
-				_origin="STELLA"
+				_origin="FORCE_ORIGIN_STELLA"
 				SCHEMA=${SCHEMA#FORCE_ORIGIN_STELLA}
 				;;
 		FORCE_ORIGIN_SYSTEM*)
-				_origin="SYSTEM"
+				_origin="FORCE_ORIGIN_SYSTEM"
 				SCHEMA=${SCHEMA#FORCE_ORIGIN_SYSTEM}
 				;;
+
+		PREFER_ORIGIN_STELLA*)
+				_origin="PREFER_ORIGIN_STELLA"
+				SCHEMA=${SCHEMA#PREFER_ORIGIN_STELLA}
+				;;
+		PREFER_ORIGIN_SYSTEM*)
+				_origin="PREFER_ORIGIN_SYSTEM"
+				SCHEMA=${SCHEMA#PREFER_ORIGIN_SYSTEM}
+				;;
 		*)
-				_origin="$(__feature_choose_force_origin $SCHEMA)"
+				_origin="$(__feature_choose_origin $SCHEMA)"
 				;;
 	esac
+	
 
-	# NOTE when linking to a system lib, we do not have control over things and all options are disabled
-	if [ "$_origin" = "SYSTEM" ]; then
-		STELLA_LINKED_LIBS_SYSTEM_LIST="$STELLA_LINKED_LIBS_SYSTEM_LIST [ ${SCHEMA} options: ${_link_OPT} ]"
-		echo "We do not link against STELLA version of $SCHEMA, but from SYSTEM."
-		if [ "$_opt_use_pkg_config" = "ON" ]; then
-			__add_toolset "pkgconfig"
-			# we need to add some defaut search into path, because pkgconfig have default values from its install path
-			# pkgconfig is installed inside stella and do not have correct default values when we want to link against SYSTEM libraries
-			echo "** WARN : adding some system lib search path for pkg-config, because we use pkg-config for a SYSTEM lib"
-			# TODO __default_linker_search_path should receive arch, because linker search path depend on arch
-			__def_path=$(__default_linker_search_path)
-			__def_path="${__def_path//:/ }"
-			for _p in $__def_path; do
-				STELLA_BUILD_PKG_CONFIG_PATH="${STELLA_BUILD_PKG_CONFIG_PATH}:${_p}/pkgconfig"
-			done
+
+	local _test
+	local _item_search_path
+
+	__log "INFO" "** Linking to $SCHEMA (with mode : $_origin)"
+
+
+	if [ "$_origin" = "PREFER_ORIGIN_STELLA" ]; then
+		__push_schema_context
+		__feature_inspect "${SCHEMA}"
+		if [ "$TEST_FEATURE" = "0" ]; then
+			__log "WARN" "** $SCHEMA (marked as $_origin) NOT found while looking for $FEAT_TEST. Will try to find it into system."
+			__pop_schema_context
+			_origin="FORCE_ORIGIN_SYSTEM"
 		fi
-		return
 	fi
 
-	echo "** Linking to $SCHEMA"
+	case $_origin in
 
-	[ "$STELLA_BUILD_COMPIL_FRONTEND" = "" ] && echo "** WARN : compil frontend empty - did you set a toolset ?"
+		# NOTE when linking to a system lib, we do not have control over build process and all options are disabled
+		FORCE_ORIGIN_SYSTEM|PREFER_ORIGIN_SYSTEM )
+
+			if [ "$_opt_use_pkg_config" = "ON" ]; then
+				__log "INFO" "** Using pkgconfig to link $SCHEMA"
+				__add_toolset "pkgconfig"
+				# we need to add some defaut search into path, because pkgconfig have default values from its install path
+				# pkgconfig is installed inside stella and do not have correct default values when we want to link against SYSTEM libraries
+				
+				__log "INFO" "** adding some system lib search path for pkg-config, because we use pkg-config for a SYSTEM lib"
+				# TODO __default_linker_search_path should receive arch, because linker search path depend on arch
+				__def_path=$(__default_linker_search_path)
+				_item_search_path="${_item_search_path}:${__def_path}"	
+			fi
+			_item_search_path="${_item_search_path}:${PATH}"
+			# TODO : finding a lib using only 'which' is not enough, at least add find in __default_linker_search_path ?
+			_test="$(PATH=${_item_search_path} which $FEAT_TEST 2>/dev/null)"
+			if [ "$_test" = "" ]; then
+				__log "WARN" "** $SCHEMA (mode : $_origin) NOT found while looking for $FEAT_TEST. Which may be a problem or not."
+			else
+				__log "INFO" "** $SCHEMA (mode : $_origin) found in $_test. Was looking for $FEAT_TEST."
+			fi
+
+			__try_link_with_stella_feature=0
+			if [ "$_origin" = "PREFER_ORIGIN_SYSTEM" ]; then
+				if [ "$_test" = "" ]; then
+					# NOTE : here we will try to linnk to a stella feature
+					__log "INFO" "** $SCHEMA (mode : $_origin) NOT found while looking for $FEAT_TEST. Which may be a problem or not."
+					__try_link_with_stella_feature=1
+				fi
+			fi
+			
+			if [ "${__try_link_with_stella_feature}" = "0" ]; then
+				STELLA_LINKED_LIBS_SYSTEM_LIST="$STELLA_LINKED_LIBS_SYSTEM_LIST [ ${SCHEMA} options: ${_link_OPT} ]"
+				if [ "$_opt_use_pkg_config" = "ON" ]; then
+					__def_path="${__def_path//:/ }"
+					for _p in $__def_path; do
+						STELLA_BUILD_PKG_CONFIG_PATH="${STELLA_BUILD_PKG_CONFIG_PATH}:${_p}/pkgconfig"
+					done
+				fi
+				return
+			fi
+		;;
+
+	esac
 
 
 
-	# INSPECT required lib through schema
-	__push_schema_context
-	__feature_inspect "${SCHEMA}"
-	if [ "$TEST_FEATURE" = "0" ]; then
-		echo " ** ERROR : depend on lib $SCHEMA but not installed - you may add it to FEAT_SOURCE_DEPENDENCIES"
-		__pop_schema_context
-		return
+	if [ ! "$_origin" = "PREFER_ORIGIN_STELLA" ]; then
+		# INSPECT required lib through schema
+		__push_schema_context
+		__feature_inspect "${SCHEMA}"
+		if [ "$TEST_FEATURE" = "0" ]; then
+			__log "ERROR" "$SCHEMA (mode : $_origin) NOT found - you may add it to FEAT_SOURCE_DEPENDENCIES"
+			__pop_schema_context
+			return
+		fi
 	fi
+
+
+
 	# TODO here : full reinit (or call of FEAT_ENV_CALLBACK) of the feature to override other versions of the feature
 	STELLA_LINKED_LIBS_LIST="$STELLA_LINKED_LIBS_LIST [ ${SCHEMA} options: ${_link_OPT} ]"
 	local REQUIRED_LIB_ROOT="$FEAT_INSTALL_ROOT"
@@ -197,6 +281,9 @@ __link_feature_library() {
 
 
 	# RESULTS
+
+	[ "$STELLA_BUILD_COMPIL_FRONTEND" = "" ] && __log "WARN" "** WARN : compil frontend empty - did you set a toolset ?"
+
 
 	# root folder
 	_ROOT="$REQUIRED_LIB_ROOT"

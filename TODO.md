@@ -50,9 +50,9 @@ http://tangar.info/en/t
 
 
 # command line tools list
+https://github.com/herrbischoff/awesome-command-line-apps <== very good
 https://github.com/agarrharr/awesome-cli-apps
 https://terminalsare.sexy/
-https://github.com/herrbischoff/awesome-command-line-apps
 https://hackernoon.com/macbook-my-command-line-utilities-f8a121c3b019
 
 # various recipe to write
@@ -115,6 +115,7 @@ use
 * https://bugs.archlinux.org/task/59562
 * https://github.com/coreutils/gnulib/commit/4af4a4a71827c0bc5e0ec67af23edef4f15cee8e#diff-5bcce8ce55246264586c4aed2a45ff89
 * https://github.com/buildroot/buildroot/commit/c48f8a64626c60bd1b46804b7cf1a699ff53cdf3
+* solution for m4 : http://www.linuxfromscratch.org/lfs/downloads/8.4/LFS-BOOK-8.4-NOCHUNKS.html#ch-tools-m4
 
 - various cross compiler https://blog.filippo.io/easy-windows-and-linux-cross-compilers-for-macos/
  - [ ] use of mingw-w64 for target : windows https://github.com/Homebrew/homebrew-core/blob/master/Formula/mingw-w64.rb
@@ -410,3 +411,32 @@ https://coreos.com/tectonic/docs/latest/install/bare-metal/metal-terraform.html
   https://github.com/docker/infrakit
     OS
   https://github.com/linuxkit/linuxkit
+
+
+## spark deploy
+https://markobigdata.com/2019/07/31/provision-apache-spark-in-aws-with-hashistack-and-ansible/
+
+## NOTES on features origin
+
+used in functions feature_init, feature_install and link_feature_library
+  
+  * FORCE_ORIGIN_STELLA dependency [DEFAULT MODE]
+
+	- force to use a STELLA feature as dependency or to link to (link_feature_library : by adding STELLA item path in lib flags or lib search path)
+	- try to find item with FEAT_TEST value. feature_install and link_feature_library only : if not found exit with ERROR
+	
+  * FORCE_ORIGIN_SYSTEM dependency
+
+	- force to use an already installed on SYSTEM item as dependency or to link to (link_feature_library : by NOT including any STELLA item path in lib flags or lib search path)
+	- try to find item with FEAT_TEST value, if not found print INFO
+	
+  * PREFER_ORIGIN_STELLA dependency
+
+	- in order, try first to use a STELLA feature or second an already present item on SYSTEM as dependency or to link to
+	- try to find STELLA item with FEAT_TEST value, if not found, try to find SYSTEM item. feature_install and link_feature_library only : if not found exit with ERROR
+	
+  * PREFER_ORIGIN_SYSTEM dependency
+
+	- in order, try first to use an already present item on SYSTEM or second a STELLA feature as dependency or to link to
+	- try to find SYSTEM item with FEAT_TEST value, if not found, try to find STELLA item. feature_install and link_feature_library only : if not found exit with ERROR
+

@@ -49,7 +49,8 @@ feature_adoptopenjdk_12_0_2_10_2() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+	FEAT_TEST="java"
+	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_TEST"
 	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 }
 

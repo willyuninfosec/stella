@@ -515,6 +515,7 @@ __get_ip_from_interface() {
 #}
 
 # https://unix.stackexchange.com/questions/20784/how-can-i-resolve-a-hostname-to-an-ip-address-in-a-bash-script
+# NOTE : work even if argument passed is an ip
 # NOTE : host, dig, nslookup only request dns and do not look for ip in /etc/hosts
 # NOTE on getent :
 #					ipv4 adress
