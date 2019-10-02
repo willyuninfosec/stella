@@ -46,7 +46,8 @@ feature_allegro_5_0_11() {
 	FEAT_BINARY_CALLBACK=
 	FEAT_ENV_CALLBACK=
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT"/lib/liballegro-static.a
+	FEAT_TEST="liballegro-static.a"
+	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/lib/$FEAT_TEST"
 	FEAT_SEARCH_PATH=
 
 }

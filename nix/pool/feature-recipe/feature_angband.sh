@@ -34,7 +34,8 @@ feature_angband_4_1_3() {
 
 	FEAT_SOURCE_CALLBACK=feature_angband_link
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT"/games/angband
+	FEAT_TEST="angband"
+	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT"/games/"$FEAT_TEST"
 	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT"/games
 
 }
@@ -51,8 +52,9 @@ feature_angband_4_0_5() {
 
 	FEAT_SOURCE_CALLBACK=feature_angband_link
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT"/games/angband
-	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT"/games
+	FEAT_TEST="angband"
+	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/games/$FEAT_TEST"
+	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/games"
 
 }
 

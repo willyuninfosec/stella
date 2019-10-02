@@ -86,16 +86,16 @@ __feature_init() {
 						__feature_catalog_info "${dep}"
 						_test="$(which $FEAT_TEST 2>/dev/null)"
 						if [ "$_test" = "" ]; then
-							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies NOT found ===> Try to fallback on a STELLA recipe"
+							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) NOT found ===> Try to fallback on a STELLA recipe"
 							# look up dep as stella feature and init it
 							__feature_init ${dep}
 							if [ "$TEST_FEATURE" = "0" ]; then
-								__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies can not be initialized or is not installed. Which may be a problem or not."
+								__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) can not be initialized or is not installed. Which may be a problem or not."
 							else
-								__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies is used and initialized from STELLA."
+								__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) is used and initialized from STELLA."
 							fi
 						else
-							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies is used. Found in $_test."
+							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) is used. Found in $_test."
 						fi
 					fi
 
@@ -103,16 +103,16 @@ __feature_init() {
 						# look up dep as stella feature and init it
 						__feature_init "${dep}"
 						if [ "$TEST_FEATURE" = "0" ]; then
-							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies can not be initialized or is not installed. ===> Try to fallback on SYSTEM."
+							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) can not be initialized or is not installed. ===> Try to fallback on SYSTEM."
 							# look up dep in system
 							_test="$(which $FEAT_TEST 2>/dev/null)"
 							if [ "$_test" = "" ]; then
-								__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies NOT found. Which may be a problem or not."
+								__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) NOT found. Which may be a problem or not."
 							else
-								__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies is used. Found in SYSTEM at $_test."
+								__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) is used. Found in SYSTEM at $_test."
 							fi
 						else
-							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies is used and initialized."
+							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) is used and initialized."
 						fi
 					fi
 
@@ -121,9 +121,9 @@ __feature_init() {
 						# look up dep as stella feature and init it
 						__feature_init "${dep}"
 						if [ "$TEST_FEATURE" = "0" ]; then
-							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies can not be initialized or is not installed. Which may be a problem or not."
+							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) can not be initialized or is not installed. Which may be a problem or not."
 						else
-							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies is used and initialized."
+							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) is used and initialized."
 						fi
 					fi
 
@@ -132,9 +132,9 @@ __feature_init() {
 						__feature_catalog_info "${dep}"
 						_test="$(which $FEAT_TEST 2>/dev/null)"
 						if [ "$_test" = "" ]; then
-							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies NOT found. Which may be a problem or not."
+							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) NOT found. Which may be a problem or not."
 						else
-							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) and listed in $_dependencies is used. Found in SYSTEM at $_test."
+							__log "DEBUG" "** ${_current_feat} : $dep dependency (mode : $_origin) is used. Found in SYSTEM at $_test."
 						fi
 					fi
 
@@ -564,7 +564,7 @@ __feature_choose_origin() {
 	__translate_schema "$_SCHEMA" "_CHOOSE_ORIGIN_FEATURE_NAME"
 
 	__list_contains "${STELLA_FEATURE_FORCE_ORIGIN_FROM_SYSTEM}" "${_CHOOSE_ORIGIN_FEATURE_NAME}"
-	[ $? -eq 0 ] && echo "FORCE_ORIGIN_SYSTEM" || "FORCE_ORIGIN_STELLA"
+	[ $? -eq 0 ] && echo "FORCE_ORIGIN_SYSTEM" || echo "FORCE_ORIGIN_STELLA"
 	
 }
 
@@ -744,17 +744,17 @@ __feature_install() {
 						__feature_catalog_info "${dep}"
 						_test="$(which $FEAT_TEST 2>/dev/null)"
 						if [ "$_test" = "" ]; then
-							__log "WARN" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies NOT found ===> Try to fallback on a STELLA recipe"
+							__log "WARN" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) NOT found ===> Try to fallback on a STELLA recipe"
 							# a dependency is not added to current app properties
 							__feature_install "$dep" "$_OPT NON_DECLARED"
 							if [ "$TEST_FEATURE" = "0" ]; then
-								__log "ERROR" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies can not be initialized or is not installed."
+								__log "ERROR" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) can not be initialized or is not installed."
 								exit 1
 							else
-								__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies is installed and initialized from STELLA."
+								__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) is installed and initialized from STELLA."
 							fi
 						else
-							__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies is used. Found in $_test."
+							__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) is used. Found in $_test."
 						fi
 					fi
 
@@ -762,17 +762,17 @@ __feature_install() {
 						# a dependency is not added to current app properties
 						__feature_install "$dep" "$_OPT NON_DECLARED"
 						if [ "$TEST_FEATURE" = "0" ]; then
-							__log "WARN" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies can not be initialized or is not installed. ===> Try to fallback on SYSTEM."
+							__log "WARN" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) can not be initialized or is not installed. ===> Try to fallback on SYSTEM."
 							# look up dep in system
 							_test="$(which $FEAT_TEST 2>/dev/null)"
 							if [ "$_test" = "" ]; then
-								__log "ERROR" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies NOT found."
+								__log "ERROR" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) NOT found."
 								exit 1
 							else
-								__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies is used. Found in SYSTEM at $_test."
+								__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin)is used. Found in SYSTEM at $_test."
 							fi
 						else
-							__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies is installed and initialized."
+							__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) is installed and initialized."
 						fi
 					fi
 
@@ -783,10 +783,10 @@ __feature_install() {
 						# a dependency is not added to current app properties
 						__feature_install $dep "$_OPT NON_DECLARED"
 						if [ "$TEST_FEATURE" = "0" ]; then
-							__log "ERROR" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies can not be initialized or is not installed."
+							__log "ERROR" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) can not be initialized or is not installed."
 							exit 1
 						else
-							__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) and listed in $_dependencies is installed and initialized."
+							__log "INFO" "** ${FEAT_SCHEMA_SELECTED} : $dep dependency (mode : $_origin) is installed and initialized."
 						fi
 					fi
 
@@ -795,9 +795,9 @@ __feature_install() {
 						__feature_catalog_info "${dep}"
 						_test="$(which $FEAT_TEST 2>/dev/null)"
 						if [ "$_test" = "" ]; then
-							__log "INFO" "** ${_current_feat} : $dep dependency with force origin from SYSTEM and listed in $_dependencies NOT found. Which may be a problem or not."
+							__log "INFO" "** ${_current_feat} : $dep dependency (mode : $_origin) NOT found. Which may be a problem or not."
 						else
-							__log "INFO" "** ${_current_feat} : $dep dependency with force origin from SYSTEM and listed in $_dependencies is used. Found in SYSTEM at $_test."
+							__log "INFO" "** ${_current_feat} : $dep dependency (mode : $_origin) is used. Found in SYSTEM at $_test."
 						fi
 					fi
 					

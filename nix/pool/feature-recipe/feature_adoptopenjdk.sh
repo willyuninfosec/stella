@@ -75,7 +75,8 @@ feature_adoptopenjdk_11_0_4_11() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+	FEAT_TEST="java"
+	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_TEST"
 	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 }
 
@@ -117,7 +118,8 @@ feature_adoptopenjdk_8_u222_b10() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+	FEAT_TEST="java"
+	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_TEST"
 	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 }
 
@@ -157,7 +159,8 @@ feature_adoptopenjdk_8_u172_b11() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
-	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+	FEAT_TEST="java"
+	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_TEST"
 	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 }
 

@@ -71,9 +71,10 @@ feature_template_1_0_0() {
 	FEAT_ENV_CALLBACK=feature_template_setenv
 
 	# List of files to test if feature is installed
-	FEAT_INSTALL_TEST=$FEAT_INSTALL_ROOT/bin/template
+	FEAT_TEST="template"
+	FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_TEST"
 	# PATH to add to system PATH
-	FEAT_SEARCH_PATH=$FEAT_INSTALL_ROOT/bin
+	FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 
 }
 
