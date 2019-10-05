@@ -1,4 +1,5 @@
 # shellcheck shell=bash
+# shellcheck disable=2034
 if [ ! "$_openjdk_INCLUDED_" = "1" ]; then
 _openjdk_INCLUDED_=1
 
@@ -13,7 +14,7 @@ _openjdk_INCLUDED_=1
 # List of OpenJDK distributor : https://dzone.com/articles/java-and-the-jdks-which-one-to-use
 
 # sample usage :
-# openjdk=adoptopenjdk ./stella.sh feature install openjdk
+# openjdk=amazoncorretto ./stella.sh feature install openjdk
 
 
 feature_openjdk() {

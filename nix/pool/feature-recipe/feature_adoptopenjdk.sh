@@ -42,16 +42,17 @@ feature_adoptopenjdk_12_0_2_10_2() {
 	fi
 
 	FEAT_SOURCE_CALLBACK=
-	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
-	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
+	FEAT_BINARY_CALLBACK="feature_adoptopenjdk_fix_jni_header"
+	FEAT_ENV_CALLBACK="feature_adoptopenjdk_env"
 
+	FEAT_TEST="java"
 	if [ "$STELLA_CURRENT_PLATFORM" = "linux" ]; then
-		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_TEST"
 		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 	fi
 
 	if [ "$STELLA_CURRENT_PLATFORM" = "darwin" ]; then
-		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/java"
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/$FEAT_TEST"
 		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/Contents/Home/"
 	fi
 }
@@ -77,13 +78,14 @@ feature_adoptopenjdk_11_0_4_11() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
+	FEAT_TEST="java"
 	if [ "$STELLA_CURRENT_PLATFORM" = "linux" ]; then
-		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_TEST"
 		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 	fi
 
 	if [ "$STELLA_CURRENT_PLATFORM" = "darwin" ]; then
-		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/java"
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/$FEAT_TEST"
 		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/Contents/Home/"
 	fi
 }
@@ -126,13 +128,14 @@ feature_adoptopenjdk_8_u222_b10() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
+	FEAT_TEST="java"
 	if [ "$STELLA_CURRENT_PLATFORM" = "linux" ]; then
-		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_TEST"
 		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 	fi
 
 	if [ "$STELLA_CURRENT_PLATFORM" = "darwin" ]; then
-		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/java"
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/$FEAT_TEST"
 		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/Contents/Home/"
 	fi
 }
@@ -173,13 +176,14 @@ feature_adoptopenjdk_8_u172_b11() {
 	FEAT_BINARY_CALLBACK=feature_adoptopenjdk_fix_jni_header
 	FEAT_ENV_CALLBACK=feature_adoptopenjdk_env
 
+	FEAT_TEST="java"
 	if [ "$STELLA_CURRENT_PLATFORM" = "linux" ]; then
-		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/java"
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/bin/$FEAT_TEST"
 		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/bin"
 	fi
 
 	if [ "$STELLA_CURRENT_PLATFORM" = "darwin" ]; then
-		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/java"
+		FEAT_INSTALL_TEST="$FEAT_INSTALL_ROOT/Contents/Home/bin/$FEAT_TEST"
 		FEAT_SEARCH_PATH="$FEAT_INSTALL_ROOT/Contents/Home/"
 	fi
 }
